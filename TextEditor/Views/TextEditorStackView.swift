@@ -13,6 +13,8 @@ public protocol TextEditorStackViewDelegate: AnyObject {
     func stackViewDidRemove(_ stackView: TextEditorStackView, arrangedSubview: UIView)
 }
 
+/// viewcontrollerのscrollviewの直下に収めているStackView
+/// SubViewを追加・削除した際にdelegateで通知を受け取れる点がUIStackViewと異なる。
 open class TextEditorStackView: UIStackView {
     public weak var delegate: TextEditorStackViewDelegate?
 

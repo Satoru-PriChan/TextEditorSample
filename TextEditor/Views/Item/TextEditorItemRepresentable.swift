@@ -10,6 +10,7 @@ import UIKit
 
 public protocol TextEditorValueRepresentable {}
 
+/// TextEditorItemViewに追加する子要素のプロトコル
 @MainActor public protocol TextEditorItemRepresentable {
     /// 実際にUIとして表示するview（Valueを編集して結果を返すなどを想定）
     var contentView: UIView { get }

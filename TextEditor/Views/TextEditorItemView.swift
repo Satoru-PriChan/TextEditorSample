@@ -14,6 +14,9 @@ public protocol TextEditorItemViewDelegate: AnyObject {
     func itemView(_ itemView: TextEditorItemView, didEndDraggingAt point: CGPoint)
 }
 
+/// TextEditorStackViewにSubViewとして追加することを想定しているView
+/// テキスト、画像などを収められる。
+/// ユーザーのドラッグ開始・停止などのイベントをdelegateで受け取れる(UILongPressGestureRecognizerを利用)。
 @MainActor public final class TextEditorItemView: UIView {
     public weak var delegate: TextEditorItemViewDelegate?
 
@@ -45,6 +48,7 @@ public protocol TextEditorItemViewDelegate: AnyObject {
     }()
 
     @objc private func tap(gesture _: UITapGestureRecognizer) {
+        // 子要素がテキストであれば、テキストにフォーカスを合わせキーボードを開ける
         if let textView = contentView as? TextEditorTextView {
             _ = textView.becomeFirstResponder()
         }
@@ -87,9 +91,13 @@ public protocol TextEditorItemViewDelegate: AnyObject {
         subscribeContentSize()
     }
 
+    /// item(TextEditorItemRepresentable)のcontentViewを保持しておくための変数
+    /// viewにaddSubViewしたりremoveFromSuperViewしたりする。
     public var contentView: UIView?
 
+    /// contentViewの制約（高さも含む）
     private lazy var contentViewConstraints: [NSLayoutConstraint] = []
+    /// contentViewの高さの制約
     private var contentViewHeightConstraint: NSLayoutConstraint?
 
     private func addContentView(_ view: UIView) {
@@ -111,10 +119,12 @@ public protocol TextEditorItemViewDelegate: AnyObject {
 
     private func subscribeContentSize() {
         guard let item = item else { return }
+        // 子要素のサイズが変更されたときに呼ばれる
         item.contentSizeDidChangePublisher
             .map { max(TextEditorConstant.minimumItemHeight, $0.height) }
-            .removeDuplicates()
+            .removeDuplicates()// 無駄な更新防止
             .sink { [weak self] height in
+                // contentViewの高さの制約更新
                 self?.contentViewHeightConstraint?.constant = height
                 self?.invalidateIntrinsicContentSize()
             }
