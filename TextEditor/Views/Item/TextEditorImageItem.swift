@@ -8,6 +8,9 @@
 import Combine
 import UIKit
 
+/// 画像を表す
+/// UIViewではない
+/// 実際にView改装に追加されるのは、このクラスの持つcontentView(TextEditorItemImageView)
 @MainActor public final class TextEditorImageItem: TextEditorItemRepresentable {
     public init() {
         setUp()

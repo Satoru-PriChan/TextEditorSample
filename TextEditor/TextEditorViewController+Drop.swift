@@ -31,6 +31,7 @@ extension TextEditorViewController: UIDropInteractionDelegate {
         view.addInteraction(item)
     }
 
+    /// スタックビューに挿入されているTextEditorDragPreviewViewのうち、そのorigin.yが指定したポイントと一番近いものを返す。
     func currentPreviewView(for itemView: TextEditorItemView, at point: CGPoint) -> TextEditorDragPreviewView? {
         let allPreviewViews: [TextEditorDragPreviewView] = stackView.arrangedSubviews.compactMap { $0 as? TextEditorDragPreviewView }
         let y = itemView.convert(point, to: view).y
@@ -72,6 +73,7 @@ extension TextEditorViewController: UIDropInteractionDelegate {
         scrollIfNeeded(at: convertedPoint)
     }
 
+    /// 指定地点がViewの上下の端0.1パーセントの領域にある場合、最大30ptのスクロールを行う。
     func scrollIfNeeded(at convertedPoint: CGPoint) {
         let thresholdRate: CGFloat = 0.1 // %
         let move: CGFloat = 30.0
@@ -103,7 +105,9 @@ extension TextEditorViewController: UIDropInteractionDelegate {
     }
 
     func showCurrentDragItem(with itemView: TextEditorItemView, at location: CGPoint) {
+        // 指定したポイントに一番近いTextEditorDragPreviewView取得
         let currentPreviewView = currentPreviewView(for: itemView, at: location)
+        // 該当のTextEditorDragPreviewViewのisHiddenをfalseにして出現させ、逆にそれ以外のものはisHiddenをtrueにして隠す
         stackView.arrangedSubviews.forEach {
             guard let previewView = $0 as? TextEditorDragPreviewView else { return }
             previewView.isHidden = !previewView.isEqual(currentPreviewView)
