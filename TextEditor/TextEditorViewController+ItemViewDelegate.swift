@@ -52,7 +52,7 @@ extension TextEditorViewController: TextEditorItemViewDelegate {
             width: image.size.width / 2,
             height: image.size.height / 2
         )
-        // 指のある地点に一番近いTextEditorDragPreviewViewを表示させ、他のTextEditorDragPreviewViewは隠す
+        // 指のある地点に一番近いTextEditorDragPreviewView(緑色の高さ3のView)を表示させ、他のTextEditorDragPreviewViewは隠す
         showCurrentDragItem(with: itemView, at: point)
     }
 
@@ -62,20 +62,28 @@ extension TextEditorViewController: TextEditorItemViewDelegate {
     }
 
     public func itemView(_ itemView: TextEditorItemView, didEndDraggingAt point: CGPoint) {
+        // ドラッグが終わった地点から一番近いTextEditorDragPreviewView(緑色の高さ3のView)を取得
         if let previewView = currentPreviewView(for: itemView, at: point) {
+            // itemViewを一度stckView上から削除（移動元から）
             stackView.removeArrangedSubview(itemView)
             itemView.removeFromSuperview()
+            // TextEditorDragPreviewView があった地点（移動先）へitemViewを挿入
             if let previewIndex = stackView.arrangedSubviews.firstIndex(of: previewView) {
                 stackView.insertArrangedSubview(itemView, at: previewIndex)
             }
         }
+        // TextEditorDragPreviewViewをすべて削除
         hideCurrentDragItem()
+        // 指に追随させていたViewを削除
         dragPreviewImageView?.image = nil
         dragPreviewImageView?.removeFromSuperview()
 
+        // itemviewのドラッグ終了アニメーション
         UIView.animate(withDuration: 0.3) { [weak itemView] in
             guard let itemView = itemView else { return }
+            // 透明度を通常に戻す
             itemView.alpha = 1
+            // transformをデフォルトに戻す
             itemView.transform = .identity
         }
     }
